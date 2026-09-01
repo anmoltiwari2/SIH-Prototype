@@ -22,12 +22,17 @@ export async function NavbarAuth() {
 
   // If we have an ID but no name, fetch from the database
   if (userId && !userName) {
-    const customer = await prisma.customerProfile.findUnique({ where: { userId } })
-    if (customer) {
-      userName = customer.name
-    } else {
-      const worker = await prisma.workerProfile.findUnique({ where: { userId } })
-      if (worker) userName = worker.name
+    try {
+      const customer = await prisma.customerProfile.findUnique({ where: { userId } })
+      if (customer) {
+        userName = customer.name
+      } else {
+        const worker = await prisma.workerProfile.findUnique({ where: { userId } })
+        if (worker) userName = worker.name
+      }
+    } catch (e) {
+      console.warn("Database connection failed in NavbarAuth, falling back to default name.")
+      userName = 'User'
     }
   }
 

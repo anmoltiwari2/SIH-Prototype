@@ -27,19 +27,23 @@ export async function verifyDigiLocker() {
   }
 
   // Update or Create user verification tier in the database
-  await prisma.user.upsert({
-    where: { id: userId },
-    update: {
-      verificationTier: 'ID_VERIFIED',
-      digiLockerId: `DL-MOCK-${Math.floor(Math.random() * 1000000)}`
-    },
-    create: {
-      id: userId,
-      phone: phone || `+91${Math.floor(Math.random() * 10000000000)}`,
-      verificationTier: 'ID_VERIFIED',
-      digiLockerId: `DL-MOCK-${Math.floor(Math.random() * 1000000)}`
-    }
-  })
+  try {
+    await prisma.user.upsert({
+      where: { id: userId },
+      update: {
+        verificationTier: 'ID_VERIFIED',
+        digiLockerId: `DL-MOCK-${Math.floor(Math.random() * 1000000)}`
+      },
+      create: {
+        id: userId,
+        phone: phone || `+91${Math.floor(Math.random() * 10000000000)}`,
+        verificationTier: 'ID_VERIFIED',
+        digiLockerId: `DL-MOCK-${Math.floor(Math.random() * 1000000)}`
+      }
+    })
+  } catch (e) {
+    console.warn("Database connection failed in verifyDigiLocker, bypassing for prototype.")
+  }
 
   redirect('/setup-profile')
 }
