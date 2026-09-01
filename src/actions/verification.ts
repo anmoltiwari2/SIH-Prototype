@@ -15,7 +15,6 @@ export async function verifyDigiLocker() {
     userId = mockUserId
   }
 
-  const cookieStore = await cookies()
   const phone = process.env.NODE_ENV === 'development' ? cookieStore.get('mock_phone')?.value || '+919999999999' : ''
 
   if (!userId) {
