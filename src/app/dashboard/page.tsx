@@ -27,7 +27,7 @@ export default async function DashboardPage() {
   }
 
   const role = cookieStore.get('mock_user_role')?.value || 'CUSTOMER'
-  const isMockUser = false // Force use of real database
+  const isMockUser = !!cookieStore.get('mock_user_id')?.value
 
   if (role === 'WORKER') {
     let workerProfile: any = null;

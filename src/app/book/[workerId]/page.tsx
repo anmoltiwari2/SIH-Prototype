@@ -17,7 +17,7 @@ export default async function BookingPage({ params }: { params: Promise<{ worker
   
   const cookieStore = await cookies();
   const mockUserId = cookieStore.get('mock_user_id')?.value;
-  const isMockUser = false; // Force use of real database
+  const isMockUser = !!mockUserId;
   
   if (mockUserId) {
     customerId = mockUserId;
