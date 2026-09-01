@@ -10,9 +10,8 @@ import { SOSForm } from '@/components/booking/SOSForm';
 export default async function SOSPage() {
   let customerId = '';
   const cookieStore = await cookies();
-  
   const mockUserId = cookieStore.get('mock_user_id')?.value;
-  const isMockUser = !!mockUserId;
+  const isMockUser = false; // Force use of real database
   
   if (mockUserId) {
     customerId = mockUserId;
