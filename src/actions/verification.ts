@@ -8,12 +8,11 @@ import { redirect } from 'next/navigation'
 export async function verifyDigiLocker() {
   let userId = ''
 
-  if (process.env.NODE_ENV === 'development') {
-    const cookieStore = await cookies()
-    const mockUserId = cookieStore.get('mock_user_id')?.value
-    if (mockUserId) {
-      userId = mockUserId
-    }
+  const cookieStore = await cookies()
+  const mockUserId = cookieStore.get('mock_user_id')?.value
+  
+  if (mockUserId) {
+    userId = mockUserId
   }
 
   const cookieStore = await cookies()

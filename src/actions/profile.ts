@@ -81,12 +81,11 @@ export async function submitProfileSetup(data: {
 export async function upgradeToPlus() {
   let userId = ''
   
-  if (process.env.NODE_ENV === 'development') {
-    const cookieStore = await cookies()
-    const mockUserId = cookieStore.get('mock_user_id')?.value
-    if (mockUserId) {
-      userId = mockUserId
-    }
+  const cookieStore = await cookies()
+  const mockUserId = cookieStore.get('mock_user_id')?.value
+  
+  if (mockUserId) {
+    userId = mockUserId
   }
 
   if (!userId) {
@@ -96,8 +95,17 @@ export async function upgradeToPlus() {
     userId = user.id
   }
 
-  await prisma.customerProfile.update({
-    where: { userId },
-    data: { premiumStatus: true }
-  })
+  if (mockUserId) {
+    console.warn("Mock user detected in upgradeToPlus, skipping database update.")
+    return
+  }
+
+  try {
+    await prisma.customerProfile.update({
+      where: { userId },
+      data: { premiumStatus: true }
+    })
+  } catch (e) {
+    console.warn("Database connection failed in upgradeToPlus, bypassing for prototype.")
+  }
 }

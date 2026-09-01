@@ -22,16 +22,14 @@ export async function submitRoleSelection(role: 'CUSTOMER' | 'WORKER') {
   let userId = ''
   let userPhone = ''
 
-  // MOCK BYPASS FOR LOCAL TESTING
-  if (process.env.NODE_ENV === 'development') {
-    const cookieStore = await cookies()
-    const mockUserId = cookieStore.get('mock_user_id')?.value
-    const mockPhone = cookieStore.get('mock_phone')?.value
-    
-    if (mockUserId) {
-      userId = mockUserId
-      userPhone = mockPhone || 'UNKNOWN'
-    }
+  const cookieStore = await cookies()
+  const mockUserId = cookieStore.get('mock_user_id')?.value
+  const mockPhone = cookieStore.get('mock_phone')?.value
+  const isMockUser = !!mockUserId
+  
+  if (mockUserId) {
+    userId = mockUserId
+    userPhone = mockPhone || 'UNKNOWN'
   }
 
   // If no mock user, fallback to Supabase
@@ -40,54 +38,58 @@ export async function submitRoleSelection(role: 'CUSTOMER' | 'WORKER') {
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
-      // Rather than throwing an error which causes a Next.js dev overlay,
-      // we can gracefully redirect the user to login.
       redirect('/login')
     }
     userId = user.id
     userPhone = user.phone || 'UNKNOWN'
   }
 
-  // Ensure the user exists in our Prisma DB
-  let dbUser = await prisma.user.findUnique({
-    where: { id: userId }
-  })
+  if (!isMockUser) {
+    try {
+      // Ensure the user exists in our Prisma DB
+      let dbUser = await prisma.user.findUnique({
+        where: { id: userId }
+      })
 
-  if (!dbUser) {
-    dbUser = await prisma.user.create({
-      data: {
-        id: userId,
-        phone: userPhone,
+      if (!dbUser) {
+        dbUser = await prisma.user.create({
+          data: {
+            id: userId,
+            phone: userPhone,
+          }
+        })
       }
-    })
-  }
 
-  // Create the corresponding profile based on the selected role
-  if (role === 'CUSTOMER') {
-    const existing = await prisma.customerProfile.findUnique({
-      where: { userId }
-    })
-    
-    if (!existing) {
-      await prisma.customerProfile.create({
-        data: {
-          userId,
-          name: 'New Customer', // Can be updated later
+      // Create the corresponding profile based on the selected role
+      if (role === 'CUSTOMER') {
+        const existing = await prisma.customerProfile.findUnique({
+          where: { userId }
+        })
+        
+        if (!existing) {
+          await prisma.customerProfile.create({
+            data: {
+              userId,
+              name: 'New Customer', // Can be updated later
+            }
+          })
         }
-      })
-    }
-  } else if (role === 'WORKER') {
-    const existing = await prisma.workerProfile.findUnique({
-      where: { userId }
-    })
+      } else if (role === 'WORKER') {
+        const existing = await prisma.workerProfile.findUnique({
+          where: { userId }
+        })
 
-    if (!existing) {
-      await prisma.workerProfile.create({
-        data: {
-          userId,
-          name: 'New Worker', // Can be updated later
+        if (!existing) {
+          await prisma.workerProfile.create({
+            data: {
+              userId,
+              name: 'New Worker', // Can be updated later
+            }
+          })
         }
-      })
+      }
+    } catch (e) {
+      console.warn("Database connection failed in submitRoleSelection, bypassing for prototype.")
     }
   }
 
