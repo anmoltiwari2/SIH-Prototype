@@ -1,0 +1,222 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // directUrl = env("DIRECT_URL") // Optional: for Supabase connection pooling if configured
+}
+
+// -----------------------------------------------------------------------------
+// Core User Identity
+// -----------------------------------------------------------------------------
+model User {
+  // Using UUID to map perfectly with Supabase's auth.users table id
+  id                String   @id @db.Uuid
+  phone             String   @unique
+  email             String?  @unique
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Demographic Info
+  age               Int?
+  gender            String?
+
+  // Verification status
+  digiLockerId      String?  // Masked or hashed reference
+  verificationTier  VerificationTier @default(UNVERIFIED)
+
+  // A single phone number can have one customer profile and/or one worker profile
+  customerProfile   CustomerProfile?
+  workerProfile     WorkerProfile?
+  
+  // Platform Referral System
+  referralCode      String   @unique @default(uuid())
+  referralPoints    Int      @default(0)
+  referredByCode    String?
+}
+
+enum VerificationTier {
+  UNVERIFIED
+  ID_VERIFIED
+  BACKGROUND_CHECKED
+  COMMUNITY_VOUCHED
+}
+
+// -----------------------------------------------------------------------------
+// Customer Profile
+// -----------------------------------------------------------------------------
+model CustomerProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique @db.Uuid
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  name            String
+  premiumStatus   Boolean  @default(false)
+  premiumExpiry   DateTime?
+
+  addresses       Address[]
+  bookings        Booking[] @relation("CustomerBookings")
+  reviewsGiven    Review[]  @relation("CustomerReviewsGiven")
+  reviewsReceived Review[]  @relation("CustomerReviewsReceived")
+  
+  savedWorkers    WorkerProfile[] @relation("SavedWorkers")
+}
+
+model Address {
+  id                String   @id @default(cuid())
+  customerProfileId String
+  customer          CustomerProfile @relation(fields: [customerProfileId], references: [id], onDelete: Cascade)
+  label             String   // e.g., "Home", "Office"
+  street            String
+  city              String
+  state             String
+  postalCode        String
+  latitude          Float?
+  longitude         Float?
+}
+
+// -----------------------------------------------------------------------------
+// Worker Profile
+// -----------------------------------------------------------------------------
+model WorkerProfile {
+  id                String   @id @default(cuid())
+  userId            String   @unique @db.Uuid
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  name              String
+  premiumStatus     Boolean  @default(false) // "GullyGigs Pro"
+  
+  // Worker-specific metrics
+  cumulativeRating  Float    @default(0.0)
+  ratingCount       Int      @default(0)
+  vouchCount        Int      @default(0)
+  gradeTier         WorkerGrade @default(BRONZE)
+  
+  // Work preferences
+  remoteOnly        Boolean  @default(false)
+  serviceRadiusKm   Float?
+  
+  // Financials
+  securityDepositBalance Float @default(0.0)
+  
+  // Relations
+  servicesOffered   WorkerService[]
+  bookings          Booking[] @relation("WorkerBookings")
+  reviewsGiven      Review[]  @relation("WorkerReviewsGiven")
+  reviewsReceived   Review[]  @relation("WorkerReviewsReceived")
+  savedByCustomers  CustomerProfile[] @relation("SavedWorkers")
+}
+
+enum WorkerGrade {
+  BRONZE
+  SILVER
+  GOLD
+  PLATINUM
+}
+
+// Defines what a worker offers (e.g., Plumbing -> Leak repair)
+model WorkerService {
+  id              String   @id @default(cuid())
+  workerId        String
+  worker          WorkerProfile @relation(fields: [workerId], references: [id], onDelete: Cascade)
+  
+  category        String   // e.g., "Skilled Home Trades"
+  subcategory     String   // e.g., "Plumbing"
+  payRate         Float    
+  payUnit         PayUnit  // HOURLY, PER_PROJECT, etc.
+  supportsOnline  Boolean  @default(false)
+  supportsOffline Boolean  @default(true)
+}
+
+enum PayUnit {
+  HOURLY
+  PER_PROJECT
+  PER_VISIT
+}
+
+// -----------------------------------------------------------------------------
+// Bookings & Escrow
+// -----------------------------------------------------------------------------
+model Booking {
+  id              String   @id @default(cuid())
+  
+  customerId      String
+  customer        CustomerProfile @relation("CustomerBookings", fields: [customerId], references: [id])
+  
+  workerId        String?  // Can be null if it's an open bounty job
+  worker          WorkerProfile?  @relation("WorkerBookings", fields: [workerId], references: [id])
+  
+  category        String
+  subcategory     String
+  mode            BookingMode
+  description     String
+  mediaUrl        String?  // For AR/Video triage attachments
+  
+  scheduledTime   DateTime
+  estimatedHours  Float?
+  
+  // Financials (Escrow tracking)
+  totalAmount     Float
+  platformFee     Float
+  workerPayout    Float
+  
+  status          BookingStatus @default(PENDING)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  reviews         Review[]
+}
+
+enum BookingMode {
+  ONLINE
+  OFFLINE
+}
+
+enum BookingStatus {
+  PENDING
+  ACCEPTED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  DISPUTED
+}
+
+// -----------------------------------------------------------------------------
+// Ratings & Reviews
+// -----------------------------------------------------------------------------
+model Review {
+  id              String   @id @default(cuid())
+  bookingId       String
+  booking         Booking  @relation(fields: [bookingId], references: [id])
+  
+  rating          Int      // 1-5 stars
+  comment         String?
+  
+  // Bi-directional rating tracking
+  authorType      ProfileType
+  
+  // Customer Review tracking
+  customerAuthorId  String?
+  customerAuthor    CustomerProfile? @relation("CustomerReviewsGiven", fields: [customerAuthorId], references: [id])
+  customerTargetId  String?
+  customerTarget    CustomerProfile? @relation("CustomerReviewsReceived", fields: [customerTargetId], references: [id])
+  
+  // Worker Review tracking
+  workerAuthorId    String?
+  workerAuthor      WorkerProfile?   @relation("WorkerReviewsGiven", fields: [workerAuthorId], references: [id])
+  workerTargetId    String?
+  workerTarget      WorkerProfile?   @relation("WorkerReviewsReceived", fields: [workerTargetId], references: [id])
+
+  createdAt       DateTime @default(now())
+}
+
+enum ProfileType {
+  CUSTOMER
+  WORKER
+}

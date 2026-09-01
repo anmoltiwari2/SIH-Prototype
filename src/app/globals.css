@@ -1,26 +1,136 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
+  /* Core Colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  
+  /* Glassmorphism Variables */
+  --color-glass-bg: var(--glass-bg);
+  --color-glass-border: var(--glass-border);
+  --color-glass-shimmer: var(--glass-shimmer);
+  
+  /* Radii */
+  --radius-glass: 20px;
+  
+  /* Fonts */
+  --font-sans: var(--font-geist-sans), "Inter", Arial, sans-serif;
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  /* Vibrant Light Mode - Bright Mesh Gradient */
+  --bg-color-1: #ff9a9e; /* Pink */
+  --bg-color-2: #fecfef; /* Light pink/white */
+  --bg-color-3: #a1c4fd; /* Soft Blue */
+  --bg-color-4: #fbc2eb; /* Violet/Pink */
+  
+  --background: #fcfcfc;
+  --foreground: #1c1c1e;
+  
+  /* Primary CTA - Deep indigo to contrast with bright bg */
+  --primary: #4f46e5; 
+  --primary-hover: #4338ca;
+  
+  /* Accent - Vibrant Orange/Amber */
+  --accent: #f97316;
+  --accent-hover: #ea580c;
+  
+  /* Ultra-Glassy Light */
+  --glass-bg: rgba(255, 255, 255, 0.4);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --glass-shimmer: rgba(255, 255, 255, 0.7);
+}
+
+.dark {
+  /* Vibrant Dark Mode - Deep Neon Mesh */
+  --bg-color-1: #09090b; /* Very dark slate */
+  --bg-color-2: #310e68; /* Deep Purple */
+  --bg-color-3: #0c1a4b; /* Deep Navy */
+  --bg-color-4: #4a044e; /* Deep Magenta */
+  
+  --background: #09090b;
+  --foreground: #f8fafc;
+  
+  /* Primary CTA - Neon Indigo/Purple */
+  --primary: #818cf8;
+  --primary-hover: #6366f1;
+  
+  /* Accent - Neon Cyan */
+  --accent: #22d3ee;
+  --accent-hover: #06b6d4;
+  
+  /* Ultra-Glassy Dark */
+  --glass-bg: rgba(20, 20, 25, 0.5);
+  --glass-border: rgba(255, 255, 255, 0.15);
+  --glass-shimmer: rgba(255, 255, 255, 0.1);
 }
 
 body {
-  background: var(--background);
+  margin: 0;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  /* Complex animated mesh gradient using multiple radial gradients */
+  background-color: var(--bg-color-1);
+  background-image: 
+    radial-gradient(at 0% 0%, var(--bg-color-2) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, var(--bg-color-3) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, var(--bg-color-4) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, var(--bg-color-2) 0px, transparent 50%);
+  background-size: 200% 200%;
+  animation: bg-mesh 15s ease infinite alternate;
+  background-attachment: fixed;
+}
+
+/* Animations */
+@keyframes bg-mesh {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 100% 100%; }
+  100% { background-position: 0% 100%; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(var(--accent), 0.4); }
+  50% { box-shadow: 0 0 0 10px rgba(var(--accent), 0); }
+}
+
+@keyframes float-orb-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+}
+
+@keyframes float-orb-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-30px, 50px) scale(1.2); }
+  66% { transform: translate(20px, -20px) scale(0.8); }
+}
+
+.glass-panel {
+  background-color: var(--glass-bg);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--glass-shimmer) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2.5s infinite linear;
 }
