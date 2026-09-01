@@ -42,16 +42,17 @@ export async function SearchResults({ searchParams }: SearchResultsProps) {
     serviceFilter.supportsOffline = true;
   }
 
-  if (Object.keys(serviceFilter).length > 0) {
-    whereClause.servicesOffered = {
-      some: serviceFilter
-    };
+    where.servicesOffered = { some: { supportsOffline: true } };
   }
 
-  const orderByClause: any = mode === 'OFFLINE'
+  const orderByClause = sortBy === 'price_low'
+    ? { servicesOffered: { _count: 'asc' } }
+    : sortBy === 'rating'
+    ? { cumulativeRating: 'desc' }
+    : sortBy === 'experience'
     ? [
-        { serviceRadiusKm: 'asc' },
-        { cumulativeRating: 'desc' }
+        { gradeTier: 'desc' },
+        { vouchCount: 'desc' }
       ]
     : { cumulativeRating: 'desc' };
 
