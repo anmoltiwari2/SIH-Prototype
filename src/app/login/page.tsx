@@ -64,9 +64,12 @@ export default function LoginPage() {
     setLoading(true)
     setError(null)
 
-    if (process.env.NODE_ENV === 'development') {
+    // Bypass Supabase API entirely if in dev mode or using the mock OTP.
+    // This prevents the API request from hanging indefinitely on Vercel
+    // when an OTP session doesn't actually exist.
+    if (process.env.NODE_ENV === 'development' || otp === '123456') {
       setTimeout(() => {
-        if (otp.length === 6) {
+        if (otp === '123456' || otp.length === 6) {
           const mockUserId = generateMockUUID()
           document.cookie = `mock_user_id=${mockUserId}; path=/; max-age=86400`
           document.cookie = `mock_phone=${phone}; path=/; max-age=86400`
@@ -75,7 +78,7 @@ export default function LoginPage() {
           setError('Please enter a valid 6-digit OTP.')
           setLoading(false)
         }
-      }, 800)
+      }, 500)
       return
     }
 
@@ -83,21 +86,6 @@ export default function LoginPage() {
     const { error } = await supabase.auth.verifyOtp({ phone: formattedPhone, token: otp, type: 'sms' })
 
     if (error) {
-      const msg = error.message.toLowerCase()
-      // Fallback to mock auth if Twilio fails or user enters the dev bypass OTP
-      if (msg.includes('twilio') || msg.includes('20003') || msg.includes('provider') || msg.includes('invalid username') || otp === '123456') {
-        console.warn('Bypassing verification due to Twilio error or mock OTP entry.')
-        if (otp.length === 6) {
-          const mockUserId = generateMockUUID()
-          document.cookie = `mock_user_id=${mockUserId}; path=/; max-age=86400`
-          document.cookie = `mock_phone=${phone}; path=/; max-age=86400`
-          router.push('/verify-identity')
-        } else {
-          setError('Please enter a valid 6-digit OTP.')
-          setLoading(false)
-        }
-        return
-      }
       setError(error.message)
       setLoading(false)
     } else {
