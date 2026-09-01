@@ -11,9 +11,11 @@ export default async function BountyBoardPage() {
   let userId = '';
   const cookieStore = await cookies();
   
-  if (process.env.NODE_ENV === 'development') {
-    const mockUserId = cookieStore.get('mock_user_id')?.value;
-    if (mockUserId) userId = mockUserId;
+  const mockUserId = cookieStore.get('mock_user_id')?.value;
+  const isMockUser = !!mockUserId;
+
+  if (mockUserId) {
+    userId = mockUserId;
   } else {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -34,18 +36,44 @@ export default async function BountyBoardPage() {
   }
 
   // 2. Fetch Open Bounties (workerId is null, status is PENDING)
-  const openBounties = await prisma.booking.findMany({
-    where: {
-      workerId: null,
-      status: 'PENDING'
-    },
-    include: {
-      customer: true
-    },
-    orderBy: {
-      createdAt: 'desc'
+  let openBounties: any[] = [];
+  if (!isMockUser) {
+    try {
+      openBounties = await prisma.booking.findMany({
+        where: {
+          workerId: null,
+          status: 'PENDING'
+        },
+        include: {
+          customer: true
+        },
+        orderBy: {
+          createdAt: 'desc'
+        }
+      });
+    } catch (e) {
+      console.warn("Database connection failed in Bounty Board, bypassing for prototype.");
     }
-  });
+  } else {
+    openBounties = [
+      {
+        id: 'bounty-1',
+        subcategory: 'Emergency Plumbing',
+        customer: { name: 'Rahul S.' },
+        workerPayout: 850,
+        description: 'Pipe burst in the kitchen, flooding the floor! Need immediate assistance.',
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: 'bounty-2',
+        subcategory: 'Electrical Short',
+        customer: { name: 'Priya K.' },
+        workerPayout: 600,
+        description: 'Main breaker keeps tripping. Half the house has no power.',
+        createdAt: new Date(Date.now() - 3600000).toISOString()
+      }
+    ];
+  }
 
   return (
     <div className="min-h-screen p-6 md:p-12 max-w-7xl mx-auto">

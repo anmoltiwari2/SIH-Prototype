@@ -29,17 +29,33 @@ export default async function DashboardPage() {
 
   const cookieStore = await cookies()
   const role = cookieStore.get('mock_user_role')?.value || 'CUSTOMER'
+  const isMockUser = !!cookieStore.get('mock_user_id')?.value
 
   if (role === 'WORKER') {
-    const workerProfile = await prisma.workerProfile.findFirst({
-      where: { userId },
-      include: {
-        bookings: {
-          include: { customer: true },
-          orderBy: { createdAt: 'desc' }
-        }
+    let workerProfile: any = null;
+
+    if (!isMockUser) {
+      try {
+        workerProfile = await prisma.workerProfile.findFirst({
+          where: { userId },
+          include: {
+            bookings: {
+              include: { customer: true },
+              orderBy: { createdAt: 'desc' }
+            }
+          }
+        });
+      } catch (e) {
+        console.warn("Database connection failed in Dashboard (WORKER), bypassing for prototype.");
       }
-    });
+    } else {
+      // Create a mock worker profile
+      workerProfile = {
+        name: 'Test Worker',
+        gradeTier: 'GOLD',
+        bookings: []
+      }
+    }
 
     if (!workerProfile) {
       return (
@@ -52,7 +68,7 @@ export default async function DashboardPage() {
       );
     }
 
-    const activeBookings = workerProfile.bookings.filter(b => b.status === 'PENDING' || b.status === 'ACCEPTED');
+    const activeBookings = workerProfile.bookings.filter((b: any) => b.status === 'PENDING' || b.status === 'ACCEPTED');
 
     return (
       <div className="min-h-screen p-6 md:p-12 max-w-7xl mx-auto">
@@ -163,15 +179,31 @@ export default async function DashboardPage() {
   }
 
   // CUSTOMER FLOW
-  const customerProfile = await prisma.customerProfile.findFirst({
-    where: { userId: userId },
-    include: {
-      bookings: {
-        include: { worker: true },
-        orderBy: { createdAt: 'desc' }
-      }
+  let customerProfile: any = null;
+
+  if (!isMockUser) {
+    try {
+      customerProfile = await prisma.customerProfile.findFirst({
+        where: { userId: userId },
+        include: {
+          bookings: {
+            include: { worker: true },
+            orderBy: { createdAt: 'desc' }
+          }
+        }
+      });
+    } catch (e) {
+      console.warn("Database connection failed in Dashboard (CUSTOMER), bypassing for prototype.");
     }
-  });
+  } else {
+    // Create a mock customer profile
+    const mockUserName = cookieStore.get('mock_user_name')?.value || 'Test Customer';
+    customerProfile = {
+      name: mockUserName,
+      premiumStatus: true,
+      bookings: []
+    }
+  }
 
   if (!customerProfile) {
     return (
