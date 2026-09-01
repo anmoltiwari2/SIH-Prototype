@@ -27,15 +27,15 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // MOCK BYPASS FOR LOCAL TESTING
-  if (process.env.NODE_ENV === 'development' && request.cookies.has('mock_user_id')) {
+  // MOCK BYPASS FOR PROTOTYPE TESTING
+  if (request.cookies.has('mock_user_id')) {
     const isPublicRoute = request.nextUrl.pathname.startsWith('/login') || 
                           request.nextUrl.pathname.startsWith('/_next') ||
                           request.nextUrl.pathname === '/'
 
     if (isPublicRoute && request.nextUrl.pathname === '/login') {
       const url = request.nextUrl.clone()
-      url.pathname = '/'
+      url.pathname = '/verify-identity' // or wherever they should go if they hit login again
       return NextResponse.redirect(url)
     }
     return supabaseResponse
