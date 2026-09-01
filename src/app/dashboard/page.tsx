@@ -26,7 +26,6 @@ export default async function DashboardPage() {
     userId = user.id
   }
 
-  const cookieStore = await cookies()
   const role = cookieStore.get('mock_user_role')?.value || 'CUSTOMER'
   const isMockUser = !!cookieStore.get('mock_user_id')?.value
 
