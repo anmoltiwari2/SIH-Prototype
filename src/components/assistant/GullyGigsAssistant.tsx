@@ -130,8 +130,7 @@ export function GullyGigsAssistant() {
     success: { y: [0, -15, 0], scale: [1, 1.1, 1], transition: { duration: 0.5, type: 'spring' } }
   };
 
-  // Shared Chat Layout for Desktop & Mobile
-  const ChatContent = () => (
+  const renderChatContent = () => (
     <>
       <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/20 z-10 relative px-2">
         <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg">
@@ -245,7 +244,7 @@ export function GullyGigsAssistant() {
                   <X size={16} />
                 </button>
                 
-                <ChatContent />
+                {renderChatContent()}
               </motion.div>
             )}
           </AnimatePresence>
@@ -342,7 +341,7 @@ export function GullyGigsAssistant() {
                 </div>
               </div>
 
-              <ChatContent />
+              {renderChatContent()}
             </motion.div>
           )}
         </AnimatePresence>

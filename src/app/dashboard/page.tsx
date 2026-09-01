@@ -199,7 +199,28 @@ export default async function DashboardPage() {
     customerProfile = {
       name: mockUserName,
       premiumStatus: true,
-      bookings: []
+      bookings: [
+        {
+          id: 'mock-booking-1',
+          subcategory: 'Emergency Plumbing SOS',
+          worker: null,
+          totalAmount: 1320,
+          status: 'PENDING',
+          mode: 'OFFLINE',
+          scheduledTime: new Date(),
+          estimatedHours: 1
+        },
+        {
+          id: 'mock-booking-2',
+          subcategory: 'Electrical Repair',
+          worker: { name: 'Vikram Electrician' },
+          totalAmount: 550,
+          status: 'PENDING',
+          mode: 'OFFLINE',
+          scheduledTime: new Date(Date.now() + 86400000), // Tomorrow
+          estimatedHours: 1
+        }
+      ]
     }
   }
 
