@@ -1,4 +1,5 @@
 import React from 'react';
+export const dynamic = 'force-dynamic';
 import { prisma } from '@/lib/prisma';
 import { BookingForm } from '@/components/booking/BookingForm';
 import { GlassCard } from '@/components/ui/GlassCard';

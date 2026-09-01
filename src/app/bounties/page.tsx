@@ -1,4 +1,5 @@
 import React from 'react';
+export const dynamic = 'force-dynamic';
 import { prisma } from '@/lib/prisma';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { MapPin, Clock, AlertTriangle, Briefcase, IndianRupee } from 'lucide-react';
