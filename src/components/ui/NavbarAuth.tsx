@@ -11,6 +11,8 @@ export async function NavbarAuth() {
   let userId = cookieStore.get('mock_user_id')?.value
   let userName = cookieStore.get('mock_user_name')?.value
 
+  const isMockUser = !!cookieStore.get('mock_user_id')?.value
+
   // If no mock user, check Supabase session
   if (!userId) {
     const supabase = await createClient()
@@ -22,17 +24,21 @@ export async function NavbarAuth() {
 
   // If we have an ID but no name, fetch from the database
   if (userId && !userName) {
-    try {
-      const customer = await prisma.customerProfile.findUnique({ where: { userId } })
-      if (customer) {
-        userName = customer.name
-      } else {
-        const worker = await prisma.workerProfile.findUnique({ where: { userId } })
-        if (worker) userName = worker.name
+    if (isMockUser) {
+      userName = 'Test User (Mock)'
+    } else {
+      try {
+        const customer = await prisma.customerProfile.findUnique({ where: { userId } })
+        if (customer) {
+          userName = customer.name
+        } else {
+          const worker = await prisma.workerProfile.findUnique({ where: { userId } })
+          if (worker) userName = worker.name
+        }
+      } catch (e) {
+        console.warn("Database connection failed in NavbarAuth, falling back to default name.")
+        userName = 'User'
       }
-    } catch (e) {
-      console.warn("Database connection failed in NavbarAuth, falling back to default name.")
-      userName = 'User'
     }
   }
 

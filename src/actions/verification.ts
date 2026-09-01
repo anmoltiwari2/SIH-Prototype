@@ -27,22 +27,28 @@ export async function verifyDigiLocker() {
   }
 
   // Update or Create user verification tier in the database
-  try {
-    await prisma.user.upsert({
-      where: { id: userId },
-      update: {
-        verificationTier: 'ID_VERIFIED',
-        digiLockerId: `DL-MOCK-${Math.floor(Math.random() * 1000000)}`
-      },
-      create: {
-        id: userId,
-        phone: phone || `+91${Math.floor(Math.random() * 10000000000)}`,
-        verificationTier: 'ID_VERIFIED',
-        digiLockerId: `DL-MOCK-${Math.floor(Math.random() * 1000000)}`
-      }
-    })
-  } catch (e) {
-    console.warn("Database connection failed in verifyDigiLocker, bypassing for prototype.")
+  const isMockUser = !!cookieStore.get('mock_user_id')?.value
+
+  if (!isMockUser) {
+    try {
+      await prisma.user.upsert({
+        where: { id: userId },
+        update: {
+          verificationTier: 'ID_VERIFIED',
+          digiLockerId: `DL-MOCK-${Math.floor(Math.random() * 1000000)}`
+        },
+        create: {
+          id: userId,
+          phone: phone || `+91${Math.floor(Math.random() * 10000000000)}`,
+          verificationTier: 'ID_VERIFIED',
+          digiLockerId: `DL-MOCK-${Math.floor(Math.random() * 1000000)}`
+        }
+      })
+    } catch (e) {
+      console.warn("Database connection failed in verifyDigiLocker, bypassing for prototype.")
+    }
+  } else {
+    console.warn("Mock user detected in verifyDigiLocker, skipping database upsert.")
   }
 
   redirect('/setup-profile')
