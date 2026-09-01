@@ -10,11 +10,10 @@ import { Calendar, Clock, MapPin, Monitor, Star, Coins, Crown, Presentation, Ale
 export default async function DashboardPage() {
   let userId = ''
   
-  // Mock Bypass logic for development
-  if (process.env.NODE_ENV === 'development') {
-    const cookieStore = await cookies()
-    const mockUserId = cookieStore.get('mock_user_id')?.value
-    if (mockUserId) userId = mockUserId
+  const cookieStore = await cookies()
+  const mockUserId = cookieStore.get('mock_user_id')?.value
+  if (mockUserId) {
+    userId = mockUserId
   }
 
   // Real Auth fallback

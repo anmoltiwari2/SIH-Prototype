@@ -104,6 +104,66 @@ export async function SearchResults({ searchParams }: SearchResultsProps) {
         servicesOffered: [
           { category: 'Skilled Home Trades', subcategory: 'Electrical Repair', payRate: 500, payUnit: 'HOURLY', supportsOnline: false }
         ]
+      },
+      {
+        id: 'mock-4',
+        name: 'Priya Tutor',
+        cumulativeRating: 4.7,
+        ratingCount: 89,
+        gradeTier: 'GOLD',
+        serviceRadiusKm: 8.4,
+        vouchCount: 24,
+        servicesOffered: [
+          { category: 'Education', subcategory: 'Math Tutoring', payRate: 600, payUnit: 'HOURLY', supportsOnline: true }
+        ]
+      },
+      {
+        id: 'mock-5',
+        name: 'Suresh Appliance Doctor',
+        cumulativeRating: 4.6,
+        ratingCount: 54,
+        gradeTier: 'GOLD',
+        serviceRadiusKm: 3.8,
+        vouchCount: 15,
+        servicesOffered: [
+          { category: 'Repair', subcategory: 'AC Servicing', payRate: 800, payUnit: 'FIXED', supportsOnline: false }
+        ]
+      },
+      {
+        id: 'mock-6',
+        name: 'Kavita Beautician',
+        cumulativeRating: 4.9,
+        ratingCount: 210,
+        gradeTier: 'DIAMOND',
+        serviceRadiusKm: 4.5,
+        vouchCount: 65,
+        servicesOffered: [
+          { category: 'Personal Care', subcategory: 'Salon at Home', payRate: 1200, payUnit: 'FIXED', supportsOnline: false }
+        ]
+      },
+      {
+        id: 'mock-7',
+        name: 'Amit Gardener',
+        cumulativeRating: 4.4,
+        ratingCount: 19,
+        gradeTier: 'SILVER',
+        serviceRadiusKm: 6.2,
+        vouchCount: 4,
+        servicesOffered: [
+          { category: 'Maintenance', subcategory: 'Landscaping', payRate: 350, payUnit: 'HOURLY', supportsOnline: false }
+        ]
+      },
+      {
+        id: 'mock-8',
+        name: 'Neha Cook',
+        cumulativeRating: 4.8,
+        ratingCount: 112,
+        gradeTier: 'GOLD',
+        serviceRadiusKm: 2.1,
+        vouchCount: 38,
+        servicesOffered: [
+          { category: 'Culinary', subcategory: 'Weekly Meal Prep', payRate: 2500, payUnit: 'FIXED', supportsOnline: false }
+        ]
       }
     ];
   }

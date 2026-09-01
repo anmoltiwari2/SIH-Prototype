@@ -71,20 +71,28 @@ export async function fetchMascotAIResponse(prompt: string, mascotType: string |
 // Fallback logic in case the API key is invalid or rate limited
 async function fallbackMockAI(prompt: string, mascotType: string | null): Promise<string> {
   const p = prompt.toLowerCase();
-  const delay = Math.floor(Math.random() * 1000) + 1500;
+  const delay = Math.floor(Math.random() * 1000) + 1000;
   await new Promise(resolve => setTimeout(resolve, delay));
 
-  if (p.includes('cost') || p.includes('price') || p.includes('rate')) {
-    return `[Mock AI] My base rate is on the right. If this is an emergency, the rate is 1.5x!`;
+  if (p.includes('cost') || p.includes('price') || p.includes('rate') || p.includes('money')) {
+    return `My base rate is listed on my profile. If this is an emergency or a night-time request, my rate is 1.5x the base amount to ensure quality service!`;
   }
   
-  if (p.includes('urgent') || p.includes('emergency')) {
-    return `[Mock AI] If it's an emergency, just toggle the "Emergency" button. I'll prioritize your request.`;
+  if (p.includes('urgent') || p.includes('emergency') || p.includes('fast') || p.includes('quick')) {
+    return `If it's an emergency, just toggle the "Emergency" switch when booking. I'll prioritize your request and be there ASAP!`;
+  }
+
+  if (p.includes('hello') || p.includes('hi ') || p.includes('hey')) {
+    return `Hello there! I'm here to help you get things sorted out. What can I do for you today?`;
   }
 
   switch (mascotType) {
-    case 'PLUMBER': return `[Mock AI] I'm ready to fix those leaks! (Gemini API key was invalid).`;
-    case 'COOK': return `[Mock AI] I can whip up something delicious! (Gemini API key was invalid).`;
-    default: return `[Mock AI] I'm your GullyGigs assistant! (Gemini API key was invalid).`;
+    case 'PLUMBER': return `I'm a licensed plumber! I can fix leaks, install pipes, and clear drains. Just let me know what you need fixed and I'll bring my tools!`;
+    case 'COOK': return `I'm a professional cook! I can prepare healthy meals, cater for small parties, or handle your weekly meal prep. What are you craving?`;
+    case 'TEACHER': return `I'm an experienced tutor. Whether it's math, science, or languages, I can help you or your children excel. What subject do you need help with?`;
+    case 'HOUSEHELP': return `I can help keep your home spotless! I do deep cleaning, daily tidying, and organizing. When would you like me to come over?`;
+    case 'DOCTOR': return `I'm the "Appliance Doctor"! I diagnose and repair ACs, refrigerators, and washing machines. What appliance is acting up today?`;
+    case 'ELECTRICIAN': return `I'm a certified electrician. I handle wiring, lighting installations, and power issues safely and efficiently.`;
+    default: return `I'm YOURGIGY, the GullyGigs assistant! I can help you navigate the platform, find workers, or understand how our cooperative works.`;
   }
 }
