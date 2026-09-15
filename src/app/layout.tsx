@@ -25,6 +25,8 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 import { NavbarAuth } from '@/components/ui/NavbarAuth';
 import { SiteNavigatorChatbot } from '@/components/assistant/SiteNavigatorChatbot';
+import { NavbarLinks } from '@/components/layout/NavbarLinks';
+import { Sidebar } from '@/components/layout/Sidebar';
 import { MascotProvider } from '@/lib/MascotContext';
 import { GullyGigsAssistant } from '@/components/assistant/GullyGigsAssistant';
 
@@ -35,53 +37,41 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col">
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-          {/* Global Glassmorphic Navbar */}
-          <header className="sticky top-0 z-50 w-full border-b border-[var(--glass-border)] bg-[var(--glass-bg)]/80 backdrop-blur-md">
-            <div className="container mx-auto px-4 h-16 flex items-center justify-between max-w-7xl">
-              <Link href="/" className="text-2xl font-extrabold text-[var(--primary)] tracking-tight">
-                GullyGigs
-              </Link>
-              <nav className="flex items-center gap-3">
-                <Link href="/sos" className="hidden sm:flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-red-500/10 text-red-600 dark:text-red-500 border border-red-500/30 hover:bg-red-500 hover:text-white transition-all shadow-sm font-bold text-sm shadow-[0_0_10px_rgba(239,68,68,0.2)]">
-                  <span className="relative flex h-2.5 w-2.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-600 dark:bg-red-500"></span>
-                  </span>
-                  SOS
-                </Link>
-                <Link href="/" className="text-sm font-semibold opacity-90 hover:opacity-100 transition-all hidden sm:flex items-center px-4 py-2.5 rounded-xl border border-[var(--glass-border)] bg-[var(--glass-bg)]/60 hover:bg-[var(--background)] shadow-sm backdrop-blur-md hover:text-[var(--primary)] hover:border-[var(--primary)]/30">
-                  Home
-                </Link>
-                <Link href="/dashboard" className="text-sm font-semibold opacity-90 hover:opacity-100 transition-all hidden sm:flex items-center px-4 py-2.5 rounded-xl border border-[var(--glass-border)] bg-[var(--glass-bg)]/60 hover:bg-[var(--background)] shadow-sm backdrop-blur-md hover:text-[var(--primary)] hover:border-[var(--primary)]/30">
-                  Dashboard
-                </Link>
-                <div className="hidden sm:block">
-                  <SiteNavigatorChatbot />
-                </div>
-                <ThemeToggle />
-                <NavbarAuth />
-              </nav>
-            </div>
-          </header>
+      <body className="min-h-full flex">
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+          
+          <Sidebar />
 
-          {/* SVG Filter for Liquid Gooey Effect */}
-          <svg style={{ position: 'absolute', width: 0, height: 0 }} aria-hidden="true">
-            <filter id="goo">
-              <feGaussianBlur in="SourceGraphic" stdDeviation="15" result="blur" />
-              <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -9" result="goo" />
-              <feBlend in="SourceGraphic" in2="goo" />
-            </filter>
-          </svg>
+          <div className="flex-1 flex flex-col min-h-screen relative w-full lg:w-[calc(100%-18rem)]">
+            {/* Minimal Global Header */}
+            <header className="sticky top-0 z-40 w-full border-b border-[var(--glass-border)] bg-[var(--glass-bg)]/80 backdrop-blur-md">
+              <div className="px-6 lg:px-10 h-16 flex items-center justify-between lg:justify-end">
+                {/* On mobile, leave space for the hamburger menu on the left */}
+                <div className="lg:hidden w-10"></div> 
+                
+                <nav className="flex items-center gap-4">
+                  <ThemeToggle />
+                  <NavbarAuth />
+                </nav>
+              </div>
+            </header>
 
-          {/* Main Content */}
-          <MascotProvider>
-            <main className="flex-grow relative z-10">
-              {children}
-            </main>
-            <GullyGigsAssistant />
-          </MascotProvider>
+            {/* SVG Filter for Liquid Gooey Effect */}
+            <svg style={{ position: 'absolute', width: 0, height: 0 }} aria-hidden="true">
+              <filter id="goo">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="15" result="blur" />
+                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -9" result="goo" />
+                <feBlend in="SourceGraphic" in2="goo" />
+              </filter>
+            </svg>
+
+            {/* Main Content */}
+            <MascotProvider>
+              <main className="flex-grow relative z-10 w-full">
+                {children}
+              </main>
+              <GullyGigsAssistant />
+            </MascotProvider>
 
           {/* Footer */}
           <footer className="w-full py-6 text-center border-t border-[var(--glass-border)] bg-[var(--glass-bg)]/50 backdrop-blur-sm mt-auto">
@@ -93,6 +83,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </p>
             <p className="text-xs opacity-50 mt-2">© {new Date().getFullYear()} All rights reserved.</p>
           </footer>
+          </div>
         </ThemeProvider>
       </body>
     </html>

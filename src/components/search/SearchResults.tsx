@@ -164,8 +164,93 @@ export async function SearchResults({ searchParams }: SearchResultsProps) {
         servicesOffered: [
           { category: 'Culinary', subcategory: 'Weekly Meal Prep', payRate: 2500, payUnit: 'FIXED', supportsOnline: false }
         ]
+      },
+      {
+        id: 'mock-9',
+        name: 'Rajesh Painter',
+        cumulativeRating: 4.6,
+        ratingCount: 67,
+        gradeTier: 'SILVER',
+        serviceRadiusKm: 5.5,
+        vouchCount: 19,
+        servicesOffered: [
+          { category: 'Skilled Home Trades', subcategory: 'Wall Painting', payRate: 350, payUnit: 'HOURLY', supportsOnline: false }
+        ]
+      },
+      {
+        id: 'mock-10',
+        name: 'Sneha Babysitter',
+        cumulativeRating: 4.9,
+        ratingCount: 88,
+        gradeTier: 'GOLD',
+        serviceRadiusKm: 3.0,
+        vouchCount: 42,
+        servicesOffered: [
+          { category: 'Caregiving', subcategory: 'Child Care', payRate: 400, payUnit: 'HOURLY', supportsOnline: false }
+        ]
+      },
+      {
+        id: 'mock-11',
+        name: 'Manoj Mechanic',
+        cumulativeRating: 4.7,
+        ratingCount: 134,
+        gradeTier: 'DIAMOND',
+        serviceRadiusKm: 7.2,
+        vouchCount: 56,
+        servicesOffered: [
+          { category: 'Mechanical', subcategory: 'Car Repair', payRate: 1500, payUnit: 'FIXED', supportsOnline: false }
+        ]
+      },
+      {
+        id: 'mock-12',
+        name: 'Sunita Yoga Instructor',
+        cumulativeRating: 4.9,
+        ratingCount: 201,
+        gradeTier: 'DIAMOND',
+        serviceRadiusKm: 0,
+        vouchCount: 89,
+        servicesOffered: [
+          { category: 'Fitness', subcategory: 'Yoga Training', payRate: 600, payUnit: 'HOURLY', supportsOnline: true }
+        ]
+      },
+      {
+        id: 'mock-13',
+        name: 'Deepak Carpenter',
+        cumulativeRating: 4.5,
+        ratingCount: 45,
+        gradeTier: 'SILVER',
+        serviceRadiusKm: 4.8,
+        vouchCount: 11,
+        servicesOffered: [
+          { category: 'Skilled Home Trades', subcategory: 'Furniture Repair', payRate: 500, payUnit: 'HOURLY', supportsOnline: false }
+        ]
+      },
+      {
+        id: 'mock-14',
+        name: 'Pooja Pet Sitter',
+        cumulativeRating: 4.8,
+        ratingCount: 76,
+        gradeTier: 'GOLD',
+        serviceRadiusKm: 2.8,
+        vouchCount: 33,
+        servicesOffered: [
+          { category: 'Caregiving', subcategory: 'Dog Walking', payRate: 200, payUnit: 'HOURLY', supportsOnline: false }
+        ]
       }
     ];
+
+    // Simple in-memory filtering for the mock data so search actually works
+    if (category && category !== 'All Categories') {
+      workers = workers.filter(w => w.servicesOffered.some(s => s.category === category));
+    }
+    if (mode === 'ONLINE') {
+      workers = workers.filter(w => w.servicesOffered.some(s => s.supportsOnline));
+    } else if (mode === 'OFFLINE') {
+      workers = workers.filter(w => w.servicesOffered.some(s => !s.supportsOnline));
+    }
+    if (minRating > 0) {
+      workers = workers.filter(w => w.cumulativeRating >= minRating);
+    }
   }
 
   if (workers.length === 0) {

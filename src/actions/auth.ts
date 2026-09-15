@@ -18,6 +18,36 @@ export async function logout() {
   redirect('/login')
 }
 
+export async function submitMockCustomerLogin() {
+  const cookieStore = await cookies()
+  const mockId = `mock_customer_${Math.floor(Math.random() * 100000)}`
+  
+  cookieStore.set('mock_user_id', mockId)
+  cookieStore.set('mock_phone', '555-0299')
+  cookieStore.set('mock_user_name', 'Mock Customer')
+  cookieStore.set('mock_user_role', 'CUSTOMER')
+  
+  redirect('/search')
+}
+
+export async function submitMockWorkerApplication(name: string, skill: string) {
+  const cookieStore = await cookies()
+  // Generate a random mock ID for this application
+  const mockId = `mock_worker_${Math.floor(Math.random() * 100000)}`
+  
+  // Set the mock user cookies to bypass login
+  cookieStore.set('mock_user_id', mockId)
+  cookieStore.set('mock_phone', '555-0199')
+  cookieStore.set('mock_user_name', name)
+  cookieStore.set('mock_user_role', 'WORKER')
+  
+  // We can also store the skill they selected in a cookie for the dashboard to read if needed
+  cookieStore.set('mock_worker_skill', skill)
+
+  // Redirect straight to dashboard, skipping login and DigiLocker!
+  redirect('/dashboard')
+}
+
 export async function submitRoleSelection(role: 'CUSTOMER' | 'WORKER') {
   let userId = ''
   let userPhone = ''
